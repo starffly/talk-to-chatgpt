@@ -1,7 +1,7 @@
 ﻿// TALK TO CHATGPT
 // ---------------
 // Author		: C. NEDELCU
-// Version		: 1.6.2
+// Version		: 2.0.0
 // Git repo 	: https://github.com/C-Nedelcu/talk-to-chatgpt
 // Chat GPT URL	: https://chat.openai.com/chat
 // How to use   : https://www.youtube.com/watch?v=VXkLQMEs3lA
@@ -173,11 +173,21 @@ function CN_SplitIntoSentences(text) {
 // Check for new messages the bot has sent. If a new message is found, it will be read out loud
 function CN_CheckNewMessages() {
 	// Any new messages?
-	var currentMessageCount = jQuery(".text-base").length;
+	var currentMessageCount = jQuery(".markdown-body").filter(function () {
+		return !$(this).parent().parent().parent().is("[class^='home_chat-message-user__']");
+	}).find("p").length;
+	if(currentMessageCount == 0){
+		currentMessageCount = jQuery(".text-base").length;
+	}
 	if (currentMessageCount > CN_MESSAGE_COUNT) {
 		// New message!
 		CN_MESSAGE_COUNT = currentMessageCount;
-		CN_CURRENT_MESSAGE = jQuery(".text-base:last").find(".items-start");
+		CN_CURRENT_MESSAGE = jQuery(".markdown-body").filter(function () {
+			return !$(this).parent().parent().parent().is("[class^='home_chat-message-user__']");
+		}).last().find("p");
+		if(CN_CURRENT_MESSAGE.length == 0){
+			CN_CURRENT_MESSAGE = jQuery(".text-base:last").find(".items-start");
+		}
 		CN_CURRENT_MESSAGE_SENTENCES = []; // Reset list of parts already spoken
 		CN_CURRENT_MESSAGE_SENTENCES_NEXT_READ = 0;
 	}
@@ -205,12 +215,15 @@ function CN_CheckNewMessages() {
 // Send a message to the bot (will simply put text in the textarea and simulate a send button click)
 function CN_SendMessage(text) {
 	// Put message in textarea
-	jQuery("textarea:first").focus();
-	var existingText = jQuery("textarea:first").val();
+	jQuery("textarea").focus();
+	var existingText = jQuery("textarea").val();
 	
 	// Is there already existing text?
-	if (!existingText) jQuery("textarea").val(text);
-	else jQuery("textarea").val(existingText+" "+text);
+	if (!existingText) jQuery("textarea")[0].value = text;
+	else jQuery("textarea")[0].value = existingText+" "+text;
+
+	const event = new Event("input", { bubbles: true, cancelable: true });
+	jQuery("textarea")[0].dispatchEvent(event);
 	
 	// Change height in case
 	var fullText = existingText+" "+text;
@@ -222,7 +235,8 @@ function CN_SendMessage(text) {
 	jQuery("textarea").closest("div").find("button").prop("disabled", false);
 	if (CN_AUTO_SEND_AFTER_SPEAKING) {
 		jQuery("textarea").closest("div").find("button").click();
-		
+		jQuery("textarea").closest("div").find("div.clickable[role='button']").click();
+
 		// Stop speech recognition until the answer is received
 		if (CN_SPEECHREC) {
 			clearTimeout(CN_TIMEOUT_KEEP_SPEECHREC_WORKING);
