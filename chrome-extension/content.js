@@ -311,6 +311,7 @@ function CN_StartSpeechRecognition() {
 			
 			// Click button
 			jQuery("textarea").closest("div").find("button").click();
+			jQuery("textarea").closest("div").find("div.clickable[role='button']").click();
 		
 			// Stop speech recognition until the answer is received
 			if (CN_SPEECHREC) {
