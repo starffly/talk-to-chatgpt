@@ -19,7 +19,7 @@ var CN_TEXT_TO_SPEECH_PITCH = 1; // This will alter the pitch for the bot's voic
 
 // Indicate a locale code such as 'fr-FR', 'en-US', to use a particular language for the speech recognition functionality (when you speak into the mic)
 // If you leave this blank, the system's default language will be used
-var CN_WANTED_LANGUAGE_SPEECH_REC = ""; //"fr-FR";
+var CN_WANTED_LANGUAGE_SPEECH_REC = "en-US"; //"fr-FR";
 
 // Determine which word will cause this scrip to stop.
 var CN_SAY_THIS_WORD_TO_STOP = "stop";
